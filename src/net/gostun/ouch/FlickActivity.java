@@ -1,11 +1,13 @@
 package net.gostun.ouch;
 
 import android.app.Activity;
-import android.content.Intent;
+import android.content.Context;
+import android.opengl.GLSurfaceView;
 import android.os.Bundle;
-import android.widget.TextView;
 
 public class FlickActivity extends Activity {
+
+	private GLSurfaceView flickGLView;
 
 	/**
 	 * Called when the activity is first created.
@@ -14,13 +16,31 @@ public class FlickActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.flick);
 
-		Intent i = getIntent();
-		float amount = i.getFloatExtra("amount", 0);
-		TextView textView = (TextView) findViewById(R.id.textView);
-		textView.setText(getString(R.string.info_flicking_amount)+amount);
+		/**
+		 * Create a GLSurfaceView instance and set it
+		 * as the contentView for this Activity.
+		 */
+		flickGLView = new FlickGLSurfaceView(this);
+		setContentView(flickGLView);
 	}
 
+	/**
+	 * An extended GLSurfaceView that allows you to
+	 * capture touch events.
+	 */
+	class FlickGLSurfaceView extends GLSurfaceView {
+		private final FlickGLRenderer flickGLRenderer;
 
+		public FlickGLSurfaceView(Context context){
+			super(context);
+
+			// Create an OpenGL ES 2.0 context
+			setEGLContextClientVersion(2);
+
+			// Create and set the GLRenderer for drawing on the GLSurfaceView
+			flickGLRenderer = new FlickGLRenderer();
+			setRenderer(flickGLRenderer);
+		}
+	}
 }

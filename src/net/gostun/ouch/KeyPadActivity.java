@@ -28,8 +28,6 @@ public class KeyPadActivity extends Activity {
 			 * Parses the entered amount.
 			 */
 			float amount = Float.parseFloat(editText_amount.getText().toString());
-			Toast t = Toast.makeText(this.getApplicationContext(), getString(R.string.info_counting_amount)+amount, Toast.LENGTH_SHORT);
-			t.show();
 
 			/**
 			 * A valid amount was entered. Launch FlickActivity.
@@ -39,6 +37,9 @@ public class KeyPadActivity extends Activity {
 			startActivity(i);
 
 		} catch (NumberFormatException e) {
+			/**
+			 * An invalid amount was entered. Notify Layer 8 accordingly.
+			 */
 			Toast t = Toast.makeText(this.getApplicationContext(), getString(R.string.warning_invalid_amount), Toast.LENGTH_SHORT);
 			t.show();
 		}
