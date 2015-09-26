@@ -1,46 +1,55 @@
 package net.gostun.ouch;
 
 import android.app.Activity;
-import android.content.Context;
-import android.opengl.GLSurfaceView;
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.FrameLayout;
+import android.widget.Toast;
+import net.gostun.ouch.moneypack.AbstractCash;
+import net.gostun.ouch.moneypack.AbstractMoneyPack;
 
 public class FlickActivity extends Activity {
 
-	private GLSurfaceView flickGLView;
-
 	/**
 	 * Called when the activity is first created.
+	 *
 	 * @param savedInstanceState
 	 */
 	@Override
-	public void onCreate(Bundle savedInstanceState){
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		/**
-		 * Create a GLSurfaceView instance and set it
+		 * Inflate a FrameLayout and sets it
 		 * as the contentView for this Activity.
 		 */
-		flickGLView = new FlickGLSurfaceView(this);
-		setContentView(flickGLView);
-	}
+		setContentView(R.layout.flick);
+		FrameLayout flickView = (FrameLayout) findViewById(R.id.flickView);
 
-	/**
-	 * An extended GLSurfaceView that allows you to
-	 * capture touch events.
-	 */
-	class FlickGLSurfaceView extends GLSurfaceView {
-		private final FlickGLRenderer flickGLRenderer;
-
-		public FlickGLSurfaceView(Context context){
-			super(context);
-
-			// Create an OpenGL ES 2.0 context
-			setEGLContextClientVersion(2);
-
-			// Create and set the GLRenderer for drawing on the GLSurfaceView
-			flickGLRenderer = new FlickGLRenderer();
-			setRenderer(flickGLRenderer);
+		/**
+		 * Retrieve and validate entered amount
+		 * from the intent.
+		 */
+		Intent i = getIntent();
+		float amount = i.getFloatExtra("amount", Float.NaN);
+		if (amount == Float.NaN) {
+			Toast.makeText(this, R.string.warning_invalid_amount, Toast.LENGTH_SHORT).show();
 		}
+
+		/**
+		 * Load MoneyPack using reflection and delegate
+		 * change-making algorithm to MoneyPack.
+		 */
+		try {
+			AbstractMoneyPack moneyPack = (AbstractMoneyPack) Class.forName(i.getStringExtra("MoneyPack")).newInstance();
+			AbstractCash[] cashList = moneyPack.getCash(amount, this);
+			for (AbstractCash cash : cashList) {
+				if (cash != null)
+					flickView.addView(cash);
+			}
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+
 	}
 }
