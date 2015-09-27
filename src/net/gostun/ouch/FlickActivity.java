@@ -38,19 +38,23 @@ public class FlickActivity extends Activity {
 		}
 
 		/**
-		 * Load MoneyPack using reflection and delegate
-		 * change-making algorithm to MoneyPack.
+		 * Draw the cash ImageViews on the screen
 		 */
 		try {
+			// Load MoneyPack using reflection and delegate change-making algorithm to MoneyPack.
 			AbstractMoneyPack moneyPack = (AbstractMoneyPack) Class.forName(intent.getStringExtra("MoneyPack")).newInstance();
 			AbstractCash[] cashList = moneyPack.getCash(amount, this);
 			if (cashList.length <= 0) {
+				// No cash to be displayed
 				TextView tv = (TextView) findViewById(R.id.statusText);
 				tv.setText(R.string.warning_invalid_amount);
 			} else {
+				// Populate FlickActivity with cash ImageViews
+				// Calculate the angle separation between each ImageView
 				int fanStartD = 60, fanEndD = 120, i = 0;
 				float inc = (cashList.length == 1) ? 0 : (fanEndD - fanStartD) / (float) cashList.length - 1;
 				for (AbstractCash cash : cashList) {
+					// Add ImageView to FrameLayout with angle offset
 					if (cash != null) {
 						flickView.addView(cash);
 						cash.setRotation(fanStartD + inc * (i++));
@@ -58,7 +62,9 @@ public class FlickActivity extends Activity {
 				}
 			}
 		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			// Handle any issues with loading the MoneyPack dynamically
 			e.printStackTrace();
+			//TODO: Notify Layer 8 of the problem
 		}
 
 	}
